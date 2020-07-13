@@ -1,0 +1,45 @@
+#include<stdlib.h>
+#include<stdio.h>
+#include<string.h>
+
+int main(int argc, char *argv[]) {
+                        /* Declaração de variaveis: */
+    /*     Ponteiro de char pra guardar a cifra e a solução dela */ 
+    /*     Int para guardar a chave e se vai cifrar ou decifrar */
+    char* cifra;
+    cifra = calloc(101, sizeof(char));
+    int chave, modo;
+
+    /* Inputs do usuario */
+    /* segundo scanf usando '\n' na mascara para evitar que o fgets leia a pula de linha */
+    /* fgets para evitar possiveis problemas com espaço */
+    scanf("%d", &modo);
+    scanf("%d\n", &chave);
+    fgets(cifra, 101, stdin);
+
+    /* Determina se o programa deve somar ou subtrair */
+    /*     se o 'modo' for 1 o resultado de "-2 * modo + 3" vai ser positivo logo a operação vai ser de soma */
+    /*     se o 'modo' for 2 o resultado de "-2 * modo + 3" vai ser negativo logo a operação vai ser de subtração */
+    modo = -2 * modo + 3;
+        for(int i = 0; i < strlen(cifra); i++) {
+    /* verifica se o caracter é maiusculo ou minusculo, se não for uma letra ele passa para o proximo sem fazer alterações */ 
+            if (cifra[i] < 123 && cifra[i] > 96) {
+    /* faz a mudança do caracter soma ou subtra dependendo do modo */ 
+    /* verifica se ultrapassou os "limites" do alfabeto dentro do ASCII */
+    /*     se sim subtrai/soma 26 para voltar ao começo */
+                cifra[i] = cifra[i]+ (chave * modo) ;
+                cifra[i] = !(96 < cifra[i]&& cifra[i]< 123) ? cifra[i] - 26 * modo: cifra[i];
+            }else if(cifra[i] < 91 && cifra[i] > 64) {
+    /* faz a mudança do caracter soma ou subtrai dependendo do modo */ 
+    /* verifica se ultrapassou os "limites" do alfabeto dentro do ASCII */
+    /*     se sim subtrai/soma 26 para voltar ao começo */
+                cifra[i] = cifra[i]+ (chave * modo) ;
+                cifra[i] = !(64 < cifra[i]&& cifra[i]< 91)? cifra[i] - 26 * modo: cifra[i];
+            }
+        } 
+    /* imprimindo o resultado e liberando o espaço na heap */
+    printf("%s", cifra);
+
+    free(cifra);
+    /* obrigado pelo resultado do teste 8! */
+}

@@ -1,0 +1,52 @@
+/*
+   Pseudo Codigo para planejar exercicio da biblioteca
+   													  */
+
+struct Livro {
+	char* nome
+	int dias
+}
+
+Livro* buscarLivro(static char* nome, static Livro** colecao) deve buscar e retornar o ponteiro de um livro dentro de uma matriz de livros
+													  		  deve funcionar tanto se a matriz for do usuario ou da biblioteca
+
+int adcionarLivro(static Livro* livro, static Livro** colecao)
+										Adciona um Livro pra uma matriz de livros
+										Se o livro já existir na matriz retorna um erro
+										Retorna um boolean
+
+void adcionarLivroVazio(Livro*)
+						Muda um livro para um espaço vazio
+						nome = "vazio"
+						dias = 0
+
+
+Livro** livrosBiblioteca (tam input)
+Livro** livrosUsr (tam 10)
+int quantidadeLivros
+
+
+
+while (enquanto 4 não for escolhido)
+{
+
+	escolha = input do usuario
+
+	case 1: (buscar livro para alugar)
+			Livro* busca = buscarLivro(input, biblioteca)
+				se busca dar algum resultado {
+					adcionarLivro(busca, livrosUsr, quantidadeLivro);
+				}
+			break
+	case 2: (mostrar livros alugados)
+			verifica se quantidadeLivro > 0 e se sim for loop para imprimir livros
+			break;
+	case 3: (devolve livro)
+			buscarLivro(input, livrosUsr)
+			adcionarLivroVazio
+			quantidadeLivros--	
+
+
+
+
+}
