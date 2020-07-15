@@ -86,9 +86,34 @@ int tamanho(char* string) {
 	return 0;
 }
 
+/* Da cast nos ponteiros void* da linha */
+void prepara_valores(Insercao* linha, Campos tipos, int campo_qnt) {
+	linha->valores = malloc(campo_qnt * sizeof(void*));
+	for(int i = 0; i < campo_qnt; i++) {
+		if(!strcmp(tipos.tipos[i], "float")) {
+			linha->valores[i] = (float*) linha->valores[i]; 
+			linha->valores[i] = malloc(sizeof(float));
+		} else if(!strcmp(tipos.tipos[i], "double")) {
+			linha->valores[i] = (double*) linha->valores[i];
+			linha->valores[i] = malloc(sizeof(double));
+		}else if(!strcmp(tipos.tipos[i], "float")) {
+			linha->valores[i] = (char*) linha->valores[i]; 
+			linha->valores[i] = malloc(sizeof(char));
+		}
+    
+		if(!strncmp(tipos.tipos[i], "char", 4)) {
+			linha->valores[i] = (char*) linha->valores[i];
+			linha->valores[i] = malloc(tamanho(tipos.tipos[i]) * sizeof(char));
+		}
+	}
+}
+
+
+
 int main(int argc, char* argv[]) {
 	/* Declaração de variaveis */
 	Campos campos;
+	Insercao* linhas = NULL;
 	char* nome_metadata;
 	FILE* arquivo_metadata; 
 	char* nome_registro;
@@ -97,7 +122,7 @@ int main(int argc, char* argv[]) {
 	FILE* arquivo_index; 
 	char* buffer;
 	char* operador;
-	int offset = 0, campo_qnt = 0;
+	int offset = 0, campo_qnt = 0, linhas_qnt = 0;
 
 	/* Abertura do arquivo fornecido na entrada */
 	nome_metadata = readline(stdin);
@@ -126,15 +151,19 @@ int main(int argc, char* argv[]) {
 	}
 
 	/* loop que lê os inputs até o fim do programa */
-	operador = malloc(7 * sizeof(char)); // O maximo que um comando tem de tamanho são 6 caracteres 7 incluindo o \0
-	scanf("%s", operador);
-	while(strcmp("exit", operador)) {
-		printf("%s\n", operador);
-		if(!strcmp("insert", operador)) {
-			buffer = readline(stdin);
-		} else if(!strcmp("search", operador)) { 
+	operador = readline(stdin);
+	while(strncmp("exit", operador, 4)) {
+		if(!strncmp("insert", operador, 6)) {
+			linhas = realloc(linhas, (linhas_qnt+1) * sizeof(Insercao));
+			prepara_valores(&linhas[linhas_qnt], campos, campo_qnt);
+			for(int i = 0; i < campo_qnt; i++) {
+			}
+			printf("aqui\n");
+			linhas_qnt++;
+		} else if(!strncmp("search", operador, 6)) { 
 		}
-		scanf("%s", operador);
+		free(operador);
+		operador = readline(stdin);
 	}
 
 	/* free e close nos arquivos */
