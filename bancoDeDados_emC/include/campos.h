@@ -20,6 +20,6 @@ void* insere_valor(void**, Campos, const char*, int);
 void imprime_valor(FILE*, Campos, int);
 void trocar(Struct_index*, Struct_index*);
 void bubble_sort(Struct_index*, int);
-int busca_binaria(const Struct_index, int, int, int);
+int busca_binaria(const Struct_index*, int, int, int);
 
 #endif
