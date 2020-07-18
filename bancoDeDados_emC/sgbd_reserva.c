@@ -1,7 +1,6 @@
 #include<stdlib.h>
 #include<stdio.h>
 #include<string.h>
-#include<util_strings.h>
 
  /* util_strings.h */
 #define READLINE_BUFFER 4096 // macro para a readline
@@ -99,36 +98,30 @@ int tamanho(char* string) {
 }
 
 /* Trata uma string de entrada e adciona ela em uma inserção de modo apropriado para seu tipo */
-void* insere_valor(void** linhas, Campos tipos, const char* entrada, int pos) {
-	void* linha = *linhas;
-	if(!strcmp(tipos.tipos[pos], "float")) {
-		linha = malloc(sizeof(float));
-		*(float*)linha = (float) atof(entrada); 
-		return linha;
+void insere_valor(Insercao* linha, Campos tipos, const char* entrada, int pos) {
+		if(!strcmp(tipos.tipos[pos], "float")) {
+			linha->valores[pos] = malloc(sizeof(float));
+		*(float*)&linha->valores[pos] = (float) atof(entrada); 
 	} else if(!strcmp(tipos.tipos[pos], "double")) {
-		linha = malloc(sizeof(double));
-		*(double*)linha = atof(entrada);
-		return linha;
+		linha->valores[pos] = malloc(sizeof(double));
+		*(double*)&linha->valores[pos] = atof(entrada);
+		*(float*)&linha->valores[pos] = (float) atof(entrada); 
 	}else if(!strcmp(tipos.tipos[pos], "char")) {
-		linha = malloc(sizeof(char));
-		*(char*)linha = entrada[0];
-		return linha;
+		linha->valores[pos] = malloc(sizeof(char));
+		*(char*)&linha->valores[pos] = entrada[0];
 	}else if(!strcmp(tipos.tipos[pos], "int")) {
-		linha = malloc(sizeof(int));
-		*(int*)linha = atoi(entrada);
-		return linha;
+		linha->valores[pos] = malloc(sizeof(int));
+		*(int*)&linha->valores[pos] = atoi(entrada);
 	} else if(!strncmp(tipos.tipos[pos], "char", 4)) {
-		linha = malloc((tamanho(tipos.tipos[pos])) * sizeof(char));
+		linha->valores[pos] = malloc((tamanho(tipos.tipos[pos])) * sizeof(char));
 
 		char* buffer;
 		buffer = strdup(&entrada[1]);
 		buffer[strlen(buffer)-1]  = '\0';
 
-		strcpy((char*)linha, buffer);
+		strcpy((char*)&linha->valores[pos], buffer);
 		free(buffer);
-		return linha;
 	}
-		return linha;
 }
 
 void imprime_valor(FILE* arquivo, Campos caracteristicas, int pos) {
@@ -193,9 +186,10 @@ int busca_binaria(const Struct_index *vetor, int inicio, int fim, int chave) {
 int main(int argc, char* argv[]) {
 	/* Declaração de variaveis */
 	Campos campos;
+	Insercao* linhas;
+	linhas = NULL;
 	Struct_index* index;
 	index = NULL;
-	void* valor;
 	char* nome_metadata;
 	FILE* arquivo_metadata; 
 	char* nome_registro;
@@ -248,28 +242,28 @@ int main(int argc, char* argv[]) {
 
 			index_existe = 0;
 			pos = 0;
+			linhas = realloc(linhas, (linhas_qnt+1) * sizeof(Insercao));
+			linhas[linhas_qnt].valores = malloc((campo_qnt+1) * sizeof(void*));
 
 			index = realloc(index, (linhas_qnt+1) * sizeof(Struct_index));
 
 			/* utilizando strtok separa a string de entrada em partes e prepara elas baseado nos tipos dos campos */
 			buffer = strdup(strtok(operador, ","));
-			valor = insere_valor(&valor, campos, &buffer[7], pos);
+			insere_valor(&linhas[linhas_qnt], campos, &buffer[7], pos);
 
-			fwrite(valor, campos.tam_bytes[pos], sizeof(char), arquivo_registro);
+			fwrite(&linhas[linhas_qnt].valores[pos], campos.tam_bytes[pos], sizeof(char), arquivo_registro);
 
-			index[linhas_qnt].chave = *(int*)valor;
+			index[linhas_qnt].chave = *(int*)&linhas[linhas_qnt].valores[pos];
 			index[linhas_qnt].offset = linhas_qnt * offset;
 
 			free(buffer);
-			free(valor);
 			pos++;
 			for(pos = 1; pos < campo_qnt; pos++) {
 				buffer = strdup(strtok(NULL, ","));
-				valor = insere_valor(&valor, campos, &buffer[1], pos);
+				insere_valor(&linhas[linhas_qnt], campos, &buffer[1], pos);
 
-				fwrite(valor, campos.tam_bytes[pos], sizeof(char), arquivo_registro);
+				fwrite(&linhas[linhas_qnt].valores[pos], campos.tam_bytes[pos], sizeof(char), arquivo_registro);
 				free(buffer);
-				free(valor);
 			}
 			fclose(arquivo_registro);
 			linhas_qnt++;
@@ -312,6 +306,13 @@ int main(int argc, char* argv[]) {
 	free(campos.nomes);
 	free(campos.tipos);
 
+	for(int i = 0; i < linhas_qnt; i++) {
+		for(int j = 0; j < campo_qnt; j++) {
+			/* free(linhas[i].valores[j]); */
+		}
+		free(linhas[i].valores);
+	}
+	free(linhas);
 	free(index);
 
 	free(nome_registro);
