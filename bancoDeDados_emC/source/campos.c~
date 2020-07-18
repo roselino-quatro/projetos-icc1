@@ -129,7 +129,7 @@ void bubble_sort(Struct_index* vetor, int tam_index) {
 }
 
 /* realiza uma busca binaria de maneira recursiva */
-int busca_binaria(const Struct_index*, int inicio, int fim, int chave) {
+int busca_binaria(const Struct_index* vetor, int inicio, int fim, int chave) {
 	if (fim < inicio) return -1;
 	int meio = (fim+inicio) / 2;
 	if (vetor[meio].chave == chave) {
